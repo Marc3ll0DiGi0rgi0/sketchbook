@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Marcello Sketchbook</title>
+<title>Sketchbook Archive</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -22,335 +22,119 @@
     color:var(--ink);
     font-family:'Inter',sans-serif;
     min-height:100vh;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    padding:32px 20px 24px;
+    padding:48px 24px 64px;
   }
-  .header{
-    text-align:center;
-    margin-bottom:28px;
-  }
+  .header{ text-align:center; max-width:560px; margin:0 auto 44px; }
   .eyebrow{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    letter-spacing:0.14em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
-    margin:0 0 6px;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--ink-soft); margin:0 0 8px;
   }
   h1{
-    font-family:'Fraunces',serif;
-    font-weight:500;
-    font-size:28px;
-    letter-spacing:-0.01em;
-    margin:0;
-    color:var(--ink);
+    font-family:'Fraunces',serif; font-weight:500; font-size:34px;
+    letter-spacing:-0.01em; margin:0; color:var(--ink);
   }
   .subtitle{
-    font-family:'Fraunces',serif;
-    font-style:italic;
-    font-weight:500;
-    font-size:14px;
-    color:var(--ink-soft);
-    margin:6px 0 0;
+    font-family:'Inter',sans-serif; font-size:14px; line-height:1.6;
+    color:var(--ink-soft); margin:14px 0 0;
   }
 
-  .stage{
-    display:flex;
-    align-items:center;
-    gap:18px;
-    perspective:1200px;
+  .grid{
+    max-width:1040px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:22px;
   }
 
-  .arrow{
-    background:none;
-    border:none;
-    cursor:pointer;
-    color:var(--ink-soft);
-    padding:10px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    transition:color 0.15s ease, transform 0.15s ease;
-  }
-  .arrow:hover:not(:disabled){ color:var(--accent); transform:scale(1.08); }
-  .arrow:disabled{ opacity:0.25; cursor:default; }
-  .arrow svg{ width:22px; height:22px; }
-
-  .page-frame{
-    position:relative;
-    width:min(58vw, 340px);
-    aspect-ratio:5.5/8.5;
+  .card{
     background:var(--surface);
-    border-radius:2px;
-    box-shadow:0 1px 2px rgba(27,27,24,0.06), 0 12px 28px rgba(27,27,24,0.10);
+    border-radius:3px;
     overflow:hidden;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    transform-style:preserve-3d;
-    backface-visibility:hidden;
-    will-change:transform;
-  }
-  .page-frame img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
+    cursor:pointer;
+    box-shadow:0 1px 2px rgba(27,27,24,0.05), 0 8px 20px rgba(27,27,24,0.06);
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+    text-decoration:none;
+    color:inherit;
     display:block;
   }
-  .empty-page{
+  .card:hover{ transform:translateY(-3px); box-shadow:0 10px 26px rgba(27,27,24,0.14); }
+  .card-thumb{
     width:100%;
-    height:100%;
+    aspect-ratio:8.5/5.5;
+    background:var(--ink);
     display:flex;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
-    text-align:center;
-    padding:24px;
-    border:1px dashed var(--line);
-    margin:10px;
-    border-radius:1px;
+    overflow:hidden;
   }
-  .empty-page .num{
-    font-family:'Fraunces',serif;
-    font-size:40px;
-    color:var(--line);
-    margin-bottom:14px;
+  .card-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .card-thumb .initials{
+    font-family:'Fraunces',serif; font-size:30px; color:#EAE8E2; opacity:0.7;
   }
-  .empty-page p{
-    font-family:'Inter',sans-serif;
-    font-size:12.5px;
-    line-height:1.5;
-    color:var(--ink-soft);
-    max-width:200px;
-    margin:0;
+  .card-body{ padding:14px 16px 16px; }
+  .card-name{ font-family:'Fraunces',serif; font-weight:500; font-size:17px; margin:0; }
+  .card-meta{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:0.05em;
+    text-transform:uppercase; color:var(--ink-soft); margin:6px 0 0;
   }
 
-  .meta-row{
-    margin-top:18px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:10px;
-  }
-  .counter{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
-    letter-spacing:0.04em;
-    color:var(--ink-soft);
-  }
-  .counter b{ color:var(--ink); font-weight:500; }
-  .date-label{
-    font-family:'Inter',sans-serif;
-    font-size:11px;
-    color:var(--ink-soft);
-    min-height:14px;
-  }
-
-  /* sheet strip — one tick per physical sheet in the notebook */
-  .sheet-strip{
-    width:min(90vw, 640px);
-    margin-top:26px;
-    display:flex;
-    align-items:flex-end;
-    gap:2px;
-    height:22px;
-    cursor:pointer;
-  }
-  .tick{
-    flex:1 1 0;
-    background:var(--line);
-    height:7px;
-    border-radius:1px;
-    transition:height 0.12s ease, background 0.12s ease;
-  }
-  .tick.filled{ background:var(--accent); height:14px; }
-  .tick.current{ background:var(--ink); height:22px; }
-  .strip-label{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:10px;
-    color:var(--ink-soft);
-    letter-spacing:0.08em;
-    margin-top:8px;
-    text-transform:uppercase;
-  }
-
-  .keyhint{
-    font-family:'Inter',sans-serif;
-    font-size:10.5px;
-    color:var(--ink-soft);
-    opacity:0.6;
-    margin-top:20px;
-  }
-
-  @media (max-width:520px){
-    .page-frame{ width:min(70vw, 300px); }
-    .sheet-strip{ height:18px; }
+  .empty-state{
+    max-width:360px; margin:60px auto 0; text-align:center;
+    font-family:'Inter',sans-serif; font-size:13.5px; color:var(--ink-soft); line-height:1.6;
   }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <p class="eyebrow">Marcello Sketchbook</p>
-  <h1>Sketchbook Number One</h1>
-  <p class="subtitle">Fuxi 5.5 × 8.5, 100 sheets</p>
+  <p class="eyebrow">Sketchbook Archive</p>
+  <h1>Sketchbook Archive</h1>
+  <p class="subtitle">A free, open collection of sketchbooks from architects and students, so you can see how they think — page by page, from anywhere in the world.</p>
 </div>
 
-<div class="stage">
-  <button class="arrow" id="prevBtn" aria-label="Previous page">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 6l-6 6 6 6"/></svg>
-  </button>
-
-  <div class="page-frame" id="pageFrame"></div>
-
-  <button class="arrow" id="nextBtn" aria-label="Next page">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 6l6 6-6 6"/></svg>
-  </button>
-</div>
-
-<div class="meta-row">
-  <div class="counter"><b id="curNum">001</b> / 100</div>
-  <div class="date-label" id="dateLabel"></div>
-</div>
-
-<div class="sheet-strip" id="sheetStrip"></div>
-<p class="strip-label">100 sheets — click a tick to jump</p>
-<p class="keyhint">use ← → to turn pages</p>
-<button id="testBtn" style="margin-top:18px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;background:none;border:1px solid var(--line);color:var(--ink-soft);padding:7px 14px;border-radius:2px;cursor:pointer;">Load sample pages to test</button>
+<div class="grid" id="grid"></div>
+<div class="empty-state" id="emptyState" style="display:none;">No sketchbooks added yet. Check back soon.</div>
 
 <script>
-const TOTAL = 100;
-let pages = {};      // { "1": {imageDataUrl, dateAdded} }
-let current = 1;
-
-const pageFrame = document.getElementById('pageFrame');
-const curNum = document.getElementById('curNum');
-const dateLabel = document.getElementById('dateLabel');
-const sheetStrip = document.getElementById('sheetStrip');
-const prevBtn = document.getElementById('prevBtn');
-const nextBtn = document.getElementById('nextBtn');
-
-function pad(n){ return String(n).padStart(3,'0'); }
-
-async function loadPages(){
+async function loadRegistry(){
+  const grid = document.getElementById('grid');
+  const emptyState = document.getElementById('emptyState');
+  let books = [];
   try{
-    const res = await fetch('manifest.json', { cache: 'no-store' });
+    const res = await fetch('registry.json', { cache: 'no-store' });
     const data = await res.json();
-    const filled = data.filled || [];
-    const dates = data.dates || {};
-    filled.forEach(n => {
-      pages[String(n)] = {
-        imageDataUrl: `images/page-${pad(n)}.jpg`,
-        dateAdded: dates[String(n)] || ''
-      };
-    });
+    books = data.books || [];
   }catch(e){
-    console.error('Could not load manifest.json', e);
+    console.error('Could not load registry.json', e);
   }
-  render();
-}
 
-function renderContent(){
-  const data = pages[String(current)];
-  pageFrame.innerHTML = '';
-  if(data && data.imageDataUrl){
-    const img = document.createElement('img');
-    img.src = data.imageDataUrl;
-    img.alt = 'Sketchbook page ' + current;
-    pageFrame.appendChild(img);
-    dateLabel.textContent = data.dateAdded ? data.dateAdded : '';
-  } else {
-    const empty = document.createElement('div');
-    empty.className = 'empty-page';
-    empty.innerHTML = `<div class="num">${pad(current)}</div><p>${current === 1 ? 'Nothing scanned in yet. Upload the first week\\'s seven pages to begin.' : 'Not filled in yet.'}</p>`;
-    pageFrame.appendChild(empty);
-    dateLabel.textContent = '';
+  if(books.length === 0){
+    emptyState.style.display = 'block';
+    return;
   }
-  curNum.textContent = pad(current);
-  prevBtn.disabled = current <= 1;
-  nextBtn.disabled = current >= TOTAL;
-  renderStrip();
+
+  books.forEach(book => {
+    const card = document.createElement('a');
+    card.className = 'card';
+    card.href = 'book.html?book=' + encodeURIComponent(book.id);
+
+    const initials = (book.owner || book.id || '?').trim().split(/\s+/).map(w => w[0]).join('').slice(0,2).toUpperCase();
+    const thumb = book.coverThumb
+      ? `<img src="${book.coverThumb}" alt="${book.owner || book.id}">`
+      : `<span class="initials">${initials}</span>`;
+
+    card.innerHTML = `
+      <div class="card-thumb">${thumb}</div>
+      <div class="card-body">
+        <p class="card-name">${book.owner || book.id}</p>
+        <p class="card-meta">${book.location || book.title || 'Sketchbook'}</p>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
 }
 
-// first paint, no animation
-function render(){ renderContent(); }
-
-// animated page turn, like flipping a bill open: rotate away,
-// swap the page at the edge-on moment, then rotate back in
-let flipping = false;
-function turnTo(target){
-  if(target < 1 || target > TOTAL || target === current || flipping) return;
-  const dir = target > current ? 1 : -1;
-  flipping = true;
-  pageFrame.style.transition = 'transform 0.16s cubic-bezier(.4,0,.7,1)';
-  pageFrame.style.transform = `rotateY(${dir * -95}deg)`;
-  setTimeout(() => {
-    current = target;
-    renderContent();
-    pageFrame.style.transition = 'none';
-    pageFrame.style.transform = `rotateY(${dir * 95}deg)`;
-    void pageFrame.offsetWidth; // force reflow
-    pageFrame.style.transition = 'transform 0.18s cubic-bezier(.2,.6,.3,1)';
-    pageFrame.style.transform = 'rotateY(0deg)';
-    setTimeout(() => { flipping = false; }, 190);
-  }, 160);
-}
-
-function renderStrip(){
-  sheetStrip.innerHTML = '';
-  for(let i = 1; i <= TOTAL; i++){
-    const t = document.createElement('div');
-    t.className = 'tick';
-    if(pages[String(i)] && pages[String(i)].imageDataUrl) t.classList.add('filled');
-    if(i === current) t.classList.add('current');
-    t.title = 'Page ' + i;
-    t.addEventListener('click', () => turnTo(i));
-    sheetStrip.appendChild(t);
-  }
-}
-
-prevBtn.addEventListener('click', () => turnTo(current - 1));
-nextBtn.addEventListener('click', () => turnTo(current + 1));
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'ArrowLeft') turnTo(current - 1);
-  if(e.key === 'ArrowRight') turnTo(current + 1);
-});
-
-loadPages();
-
-// --- sample-page testing helper ---
-const testBtn = document.getElementById('testBtn');
-const sampleColors = ['#EDE7DA','#DCE3DB','#E9DCD6','#DCE0E7','#E6E1D6','#E2DEE6'];
-
-function makeSampleSVG(n, color){
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='550' height='850'>
-    <rect width='550' height='850' fill='${color}'/>
-    <text x='40' y='90' font-family='Georgia, serif' font-size='34' fill='#2a2a26'>Sample page ${n}</text>
-    <path d='M50 160 C 150 120, 250 220, 380 160 S 500 260, 470 340' stroke='#3a3a34' stroke-width='2.5' fill='none' opacity='0.55'/>
-    <path d='M60 420 C 180 380, 260 480, 400 420 S 520 500, 480 600' stroke='#3a3a34' stroke-width='2.5' fill='none' opacity='0.4'/>
-    <text x='40' y='800' font-family='monospace' font-size='16' fill='#6b6862'>placeholder — not a real scan</text>
-  </svg>`;
-  return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-}
-
-let samplesLoaded = false;
-testBtn.addEventListener('click', () => {
-  if(!samplesLoaded){
-    for(let i = 1; i <= 6; i++){
-      pages[String(i)] = { imageDataUrl: makeSampleSVG(i, sampleColors[i-1]), dateAdded: 'sample' };
-    }
-    samplesLoaded = true;
-    testBtn.textContent = 'Clear sample pages';
-  } else {
-    for(let i = 1; i <= 6; i++){ delete pages[String(i)]; }
-    samplesLoaded = false;
-    testBtn.textContent = 'Load sample pages to test';
-  }
-  renderContent();
-});
+loadRegistry();
 </script>
-
 </body>
 </html>

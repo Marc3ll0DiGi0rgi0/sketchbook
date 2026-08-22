@@ -1,0 +1,5 @@
+{
+  "books": [
+    { "id": "marcello", "owner": "Marcello", "title": "Sketchbook" }
+  ]
+}

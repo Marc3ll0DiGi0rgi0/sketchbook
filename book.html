@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sketchbook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EAE8E2;
+    --surface:#FFFFFF;
+    --ink:#1B1B18;
+    --ink-soft:#6B6862;
+    --accent:#45564C;
+    --line:#D3D0C7;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:28px 20px 24px;
+  }
+  .back-link{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    text-decoration:none;
+    margin-bottom:18px;
+  }
+  .back-link:hover{ color:var(--accent); }
+  .header{ text-align:center; margin-bottom:24px; }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 6px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-size:28px;
+    letter-spacing:-0.01em;
+    margin:0;
+    color:var(--ink);
+  }
+  .subtitle{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-weight:500;
+    font-size:14px;
+    color:var(--ink-soft);
+    margin:6px 0 0;
+  }
+  .stage{ display:flex; align-items:center; gap:18px; perspective:1400px; }
+  .arrow{
+    background:none; border:none; cursor:pointer; color:var(--ink-soft);
+    padding:10px; display:flex; align-items:center; justify-content:center;
+    transition:color 0.15s ease, transform 0.15s ease;
+  }
+  .arrow:hover:not(:disabled){ color:var(--accent); transform:scale(1.08); }
+  .arrow:disabled{ opacity:0.25; cursor:default; }
+  .arrow svg{ width:22px; height:22px; }
+  .book-frame{
+    position:relative;
+    display:flex;
+    align-items:stretch;
+  }
+  .spiral{
+    width:20px;
+    flex:0 0 20px;
+    background:linear-gradient(180deg, transparent, transparent);
+    display:flex;
+    flex-direction:column;
+    justify-content:space-evenly;
+    align-items:center;
+    z-index:2;
+    margin-right:-10px;
+  }
+  .spiral .ring{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    border:2.5px solid var(--ink-soft);
+    background:var(--bg);
+    box-shadow:inset 0 0 0 2px var(--bg);
+  }
+  .page-frame{
+    position:relative;
+    width:min(64vw, 460px);
+    aspect-ratio:8.5/5.5;
+    background:var(--surface);
+    border-radius:2px;
+    box-shadow:0 1px 2px rgba(27,27,24,0.06), 0 12px 28px rgba(27,27,24,0.10);
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    transform-style:preserve-3d;
+    backface-visibility:hidden;
+    will-change:transform;
+    transform-origin:left center;
+    margin-left:10px;
+  }
+  .page-frame.cover, .page-frame.back{
+    background:var(--ink);
+  }
+  .page-frame img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .empty-page{
+    width:100%; height:100%; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+    padding:24px; border:1px dashed var(--line); margin:10px; border-radius:1px;
+  }
+  .empty-page .num{ font-family:'Fraunces',serif; font-size:40px; color:var(--line); margin-bottom:14px; }
+  .empty-page p{ font-family:'Inter',sans-serif; font-size:12.5px; line-height:1.5; color:var(--ink-soft); max-width:200px; margin:0; }
+  .cover-face, .back-face{
+    width:100%; height:100%; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:24px;
+    color:#EAE8E2;
+  }
+  .cover-face .label, .back-face .label{
+    font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:0.14em;
+    text-transform:uppercase; opacity:0.6; margin-bottom:10px;
+  }
+  .cover-face h2, .back-face h2{
+    font-family:'Fraunces',serif; font-weight:500; font-size:22px; margin:0;
+  }
+  .meta-row{ margin-top:18px; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .counter{ font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:0.04em; color:var(--ink-soft); }
+  .counter b{ color:var(--ink); font-weight:500; }
+  .date-label{ font-family:'Inter',sans-serif; font-size:11px; color:var(--ink-soft); min-height:14px; }
+  .sheet-strip{ width:min(90vw, 640px); margin-top:26px; display:flex; align-items:flex-end; gap:2px; height:22px; cursor:pointer; }
+  .tick{ flex:1 1 0; background:var(--line); height:7px; border-radius:1px; transition:height 0.12s ease, background 0.12s ease; }
+  .tick.filled{ background:var(--accent); height:14px; }
+  .tick.current{ background:var(--ink); height:22px; }
+  .tick.edge{ background:var(--ink-soft); }
+  .strip-label{ font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-soft); letter-spacing:0.08em; margin-top:8px; text-transform:uppercase; }
+  .keyhint{ font-family:'Inter',sans-serif; font-size:10.5px; color:var(--ink-soft); opacity:0.6; margin-top:20px; }
+  @media (max-width:640px){
+    .page-frame{ width:min(78vw, 340px); }
+    .sheet-strip{ height:18px; }
+  }
+</style>
+</head>
+<body>
+
+<a class="back-link" href="index.html">&larr; back to the archive</a>
+
+<div class="header">
+  <p class="eyebrow" id="ownerLabel">Sketchbook</p>
+  <h1 id="bookTitle">Loading&hellip;</h1>
+  <p class="subtitle">8.5 × 5.5, landscape — 100 sheets + cover + back</p>
+</div>
+
+<div class="stage">
+  <button class="arrow" id="prevBtn" aria-label="Previous page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M15 6l-6 6 6 6"/></svg>
+  </button>
+  <div class="book-frame">
+    <div class="spiral" id="spiral"></div>
+    <div class="page-frame" id="pageFrame"></div>
+  </div>
+  <button class="arrow" id="nextBtn" aria-label="Next page">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+</div>
+
+<div class="meta-row">
+  <div class="counter" id="counterLabel">Cover</div>
+  <div class="date-label" id="dateLabel"></div>
+</div>
+
+<div class="sheet-strip" id="sheetStrip"></div>
+<p class="strip-label">102 pages — cover, 100 sheets, back</p>
+<p class="keyhint">use ← → to turn pages</p>
+
+<script>
+// Page index scheme: 0 = cover, 1..100 = numbered sheets, 101 = back
+const LAST = 101;
+let current = 0;
+let pages = {};   // { "0": {file, dateAdded}, "1": {...}, ..., "101": {...} }
+let bookMeta = { title: 'Sketchbook', owner: '' };
+
+const params = new URLSearchParams(location.search);
+const bookId = params.get('book') || 'marcello';
+const basePath = 'sketchbooks/' + bookId + '/';
+
+const pageFrame = document.getElementById('pageFrame');
+const counterLabel = document.getElementById('counterLabel');
+const dateLabel = document.getElementById('dateLabel');
+const sheetStrip = document.getElementById('sheetStrip');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const ownerLabel = document.getElementById('ownerLabel');
+const bookTitle = document.getElementById('bookTitle');
+const spiral = document.getElementById('spiral');
+
+// build the spiral binding rings once
+for(let i = 0; i < 16; i++){
+  const ring = document.createElement('div');
+  ring.className = 'ring';
+  spiral.appendChild(ring);
+}
+
+function pad(n){ return String(n).padStart(3,'0'); }
+
+function fileFor(n){
+  if(n === 0) return 'cover.jpg';
+  if(n === LAST) return 'back.jpg';
+  return 'page-' + pad(n) + '.jpg';
+}
+
+async function loadPages(){
+  try{
+    const res = await fetch(basePath + 'manifest.json', { cache: 'no-store' });
+    const data = await res.json();
+    bookMeta.title = data.title || 'Sketchbook';
+    bookMeta.owner = data.owner || '';
+    const filled = data.filled || [];
+    const dates = data.dates || {};
+    filled.forEach(n => {
+      pages[String(n)] = { file: basePath + 'images/' + fileFor(n), dateAdded: dates[String(n)] || '' };
+    });
+  }catch(e){
+    console.error('Could not load manifest.json', e);
+  }
+  ownerLabel.textContent = bookMeta.owner || 'Sketchbook';
+  bookTitle.textContent = bookMeta.title;
+  document.title = bookMeta.title;
+  renderContent();
+}
+
+function renderContent(){
+  const data = pages[String(current)];
+  pageFrame.innerHTML = '';
+  pageFrame.classList.remove('cover','back');
+
+  if(current === 0){
+    pageFrame.classList.add('cover');
+    if(data && data.file){
+      const img = document.createElement('img'); img.src = data.file; img.alt = 'Cover';
+      pageFrame.appendChild(img);
+    } else {
+      const face = document.createElement('div'); face.className = 'cover-face';
+      face.innerHTML = `<div class="label">Cover</div><h2>${bookMeta.title}</h2>`;
+      pageFrame.appendChild(face);
+    }
+  } else if(current === LAST){
+    pageFrame.classList.add('back');
+    if(data && data.file){
+      const img = document.createElement('img'); img.src = data.file; img.alt = 'Back cover';
+      pageFrame.appendChild(img);
+    } else {
+      const face = document.createElement('div'); face.className = 'back-face';
+      face.innerHTML = `<div class="label">Back</div><h2>End of book</h2>`;
+      pageFrame.appendChild(face);
+    }
+  } else if(data && data.file){
+    const img = document.createElement('img'); img.src = data.file; img.alt = 'Page ' + current;
+    pageFrame.appendChild(img);
+  } else {
+    const empty = document.createElement('div'); empty.className = 'empty-page';
+    empty.innerHTML = `<div class="num">${pad(current)}</div><p>Not filled in yet.</p>`;
+    pageFrame.appendChild(empty);
+  }
+
+  dateLabel.textContent = (data && data.dateAdded) ? data.dateAdded : '';
+  counterLabel.innerHTML = current === 0 ? '<b>Cover</b>' : current === LAST ? '<b>Back</b>' : `<b>${pad(current)}</b> / 100`;
+  prevBtn.disabled = current <= 0;
+  nextBtn.disabled = current >= LAST;
+  renderStrip();
+}
+
+function renderStrip(){
+  sheetStrip.innerHTML = '';
+  for(let i = 0; i <= LAST; i++){
+    const t = document.createElement('div'); t.className = 'tick';
+    if(i === 0 || i === LAST) t.classList.add('edge');
+    if(pages[String(i)] && pages[String(i)].file) t.classList.add('filled');
+    if(i === current) t.classList.add('current');
+    t.title = i === 0 ? 'Cover' : i === LAST ? 'Back' : 'Page ' + i;
+    t.addEventListener('click', () => turnTo(i));
+    sheetStrip.appendChild(t);
+  }
+}
+
+let flipping = false;
+function turnTo(target){
+  if(target < 0 || target > LAST || target === current || flipping) return;
+  const dir = target > current ? 1 : -1;
+  flipping = true;
+  pageFrame.style.transition = 'transform 0.16s cubic-bezier(.4,0,.7,1)';
+  pageFrame.style.transform = `rotateY(${dir * -95}deg)`;
+  setTimeout(() => {
+    current = target;
+    renderContent();
+    pageFrame.style.transition = 'none';
+    pageFrame.style.transform = `rotateY(${dir * 95}deg)`;
+    void pageFrame.offsetWidth;
+    pageFrame.style.transition = 'transform 0.18s cubic-bezier(.2,.6,.3,1)';
+    pageFrame.style.transform = 'rotateY(0deg)';
+    setTimeout(() => { flipping = false; }, 190);
+  }, 160);
+}
+
+prevBtn.addEventListener('click', () => turnTo(current - 1));
+nextBtn.addEventListener('click', () => turnTo(current + 1));
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'ArrowLeft') turnTo(current - 1);
+  if(e.key === 'ArrowRight') turnTo(current + 1);
+});
+
+loadPages();
+</script>
+</body>
+</html>
