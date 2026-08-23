@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archive — Sketchbook Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --ink:#0F0F0D;
+    --ink-soft:#8A8A85;
+    --line:#E4E4E0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:24px 32px 80px;
+  }
+
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:56px;
+  }
+  .topbar-left{ display:flex; align-items:center; gap:10px; }
+  .pill{
+    font-family:'Inter',sans-serif;
+    font-size:13px;
+    color:var(--ink);
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:7px 16px;
+    text-decoration:none;
+  }
+  .pill.active{ background:var(--ink); color:var(--bg); border-color:var(--ink); }
+  .logo-link{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    color:var(--ink);
+    text-decoration:none;
+  }
+
+  .search-row{ margin:0 auto 48px; max-width:280px; }
+  #search{
+    width:100%;
+    background:transparent;
+    border:none;
+    border-bottom:1px solid var(--line);
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    padding:6px 0;
+    outline:none;
+    text-align:center;
+  }
+  #search::placeholder{ color:var(--ink-soft); }
+  #search:focus{ border-bottom-color:var(--ink); }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:36px 24px;
+  }
+  .card{
+    text-decoration:none;
+    color:inherit;
+    display:block;
+  }
+  .card.hidden{ display:none; }
+  .card-thumb{
+    width:100%;
+    aspect-ratio:8.5/5.5;
+    background:#EFEFEA;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    border-radius:2px;
+  }
+  .card-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .card-thumb .initials{
+    font-family:'Inter',sans-serif; font-weight:700; font-size:26px; color:var(--ink-soft);
+  }
+  .card-name{ font-size:14px; margin:12px 0 2px; }
+  .card-meta{ font-size:13px; color:var(--ink-soft); margin:0; }
+
+  .empty-state{
+    max-width:360px; margin:60px auto 0; text-align:center;
+    font-size:14px; color:var(--ink-soft); line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <a class="pill active" href="archive.html">All</a>
+    <a class="pill" href="index.html">Names</a>
+  </div>
+  <a class="logo-link" href="index.html">Sketchbook Archive</a>
+  <div style="width:70px;"></div>
+</div>
+
+<div class="search-row">
+  <input id="search" type="text" placeholder="Search names">
+</div>
+
+<div class="grid" id="grid"></div>
+<div class="empty-state" id="emptyState" style="display:none;">No sketchbooks added yet. Check back soon.</div>
+
+<script>
+let allBooks = [];
+
+async function loadRegistry(){
+  const grid = document.getElementById('grid');
+  const emptyState = document.getElementById('emptyState');
+  try{
+    const res = await fetch('registry.json', { cache: 'no-store' });
+    const data = await res.json();
+    allBooks = data.books || [];
+  }catch(e){
+    console.error('Could not load registry.json', e);
+  }
+
+  if(allBooks.length === 0){
+    emptyState.style.display = 'block';
+    document.getElementById('search').style.display = 'none';
+    return;
+  }
+
+  allBooks.forEach(book => {
+    const name = book.owner || book.id;
+    const card = document.createElement('a');
+    card.className = 'card';
+    card.href = 'book.html?book=' + encodeURIComponent(book.id);
+    card.dataset.name = name.toLowerCase();
+
+    const initials = name.trim().split(/\s+/).map(w => w[0]).join('').slice(0,2).toUpperCase();
+    const thumb = book.coverThumb
+      ? `<img src="${book.coverThumb}" alt="${name}">`
+      : `<span class="initials">${initials}</span>`;
+
+    card.innerHTML = `
+      <div class="card-thumb">${thumb}</div>
+      <p class="card-name">${name}</p>
+      <p class="card-meta">${book.title || 'Sketchbook'}</p>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+document.getElementById('search').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll('.card').forEach(card => {
+    card.classList.toggle('hidden', q && !card.dataset.name.includes(q));
+  });
+});
+
+loadRegistry();
+</script>
+</body>
+</html>
