@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sketchbook Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FFFFFF;
+    --ink:#0F0F0D;
+    --ink-soft:#8A8A85;
+    --line:#E4E4E0;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:56px 40px 100px;
+  }
+
+  .title{
+    font-family:'Inter',sans-serif;
+    font-weight:900;
+    font-size:clamp(38px, 7vw, 92px);
+    letter-spacing:-0.01em;
+    line-height:0.98;
+    margin:0;
+    text-transform:uppercase;
+  }
+
+  .nav-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:18px 0 64px;
+  }
+  .nav-row a{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    text-decoration:none;
+  }
+  .nav-row .arrow{ font-size:14px; }
+
+  .name-list a{
+    display:block;
+    font-family:'Inter',sans-serif;
+    font-weight:400;
+    font-size:16px;
+    line-height:1.75;
+    color:var(--ink);
+    text-decoration:none;
+  }
+  .name-list a:hover{ text-decoration:underline; }
+
+  .empty-state{
+    max-width:360px;
+    font-family:'Inter',sans-serif; font-size:14px; color:var(--ink-soft); line-height:1.6;
+  }
+</style>
+</head>
+<body>
+
+<h1 class="title">Sketchbook<br>Archive</h1>
+<div class="nav-row">
+  <a href="index.html">Archive</a>
+  <span class="arrow">&rarr;</span>
+</div>
+
+<div class="name-list" id="nameList"></div>
+<div class="empty-state" id="emptyState" style="display:none;">No sketchbooks added yet. Check back soon.</div>
+
+<script>
+let allBooks = [];
+
+async function loadRegistry(){
+  const nameList = document.getElementById('nameList');
+  const emptyState = document.getElementById('emptyState');
+  try{
+    const res = await fetch('registry.json', { cache: 'no-store' });
+    const data = await res.json();
+    allBooks = data.books || [];
+  }catch(e){
+    console.error('Could not load registry.json', e);
+  }
+
+  if(allBooks.length === 0){
+    emptyState.style.display = 'block';
+    return;
+  }
+
+  allBooks.forEach(book => {
+    const link = document.createElement('a');
+    link.href = 'book.html?book=' + encodeURIComponent(book.id);
+    link.textContent = book.owner || book.id;
+    nameList.appendChild(link);
+  });
+}
+
+loadRegistry();
+</script>
+</body>
+</html>
